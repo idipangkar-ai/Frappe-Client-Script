@@ -1,0 +1,261 @@
+// frappe.ui.form.on('DH ClientScript Form', {
+// 	refresh(frm) {
+// 		// your code here
+// 	},
+// 	after_save(frm){
+// 	    console.log("This will trigger on save");
+// 	},
+// 	on_submit(frm){
+// 	    console.log("This will trigger on on_submit function");
+// 	},
+// });
+
+// //---------- Internal API Call ---------- //
+// frappe.ui.form.on('DH ClientScript Form', {
+	
+// 	active(frm){
+// 	    console.log("Active button for Internal API checked");
+// 	   // frm.save(); // For direct save.
+// 	   frappe.call({
+//             method: 'frappe.client.get_value',
+//             args: {
+//                 'doctype': 'User',
+//                 'filters': {'email': frappe.session.user_email},
+//                 'fieldname': ['location']
+//             },
+//             callback: function(r) {
+//                 if (r.message) {
+//                     console.log("User data",r.message);
+//                     frm.set_value('internal_api', r.message.location); // set value on the form
+//                     frm.refresh_field("internal_api");
+//                 }  
+//             }
+//         });
+// 	}
+// });
+
+// // ---------- External API Call ---------- //
+// frappe.ui.form.on('DH ClientScript Form', {
+//     submit(frm) {
+//         console.log("Submit button for External API checked");
+//       letsgo(frm);
+//     }
+// });
+//     //----- Function for calling External API -----//
+//     function letsgo(frm) {
+//             var ourRequest = new XMLHttpRequest();
+//             ourRequest.open('GET', 'https://catfact.ninja/fact', true);
+
+//             ourRequest.onload = function () {
+//                 if (ourRequest.status >= 200 && ourRequest.status < 400) {
+
+//                     var ourData = JSON.parse(ourRequest.responseText);
+//                     console.log(ourData.fact);
+//                     frm.set_value('external_api', ourData.fact.substr(0, 60)); // set value on the form
+//                     frm.refresh_field("external_api");
+//                     // frm.save();
+//                 } else {
+//                     console.log("We connected to the server, but it returned an error.");
+//                 }
+//             };
+//             ourRequest.onerror = function () {
+//                 console.log("Connection error");
+//             };
+
+//             ourRequest.send();
+//         }
+
+// // ---------- Function/Working for btn ---------- //
+// frappe.ui.form.on('DH ClientScript Form', {
+//     active(frm) {
+//         console.log("Active button checked.");
+//         // frm.save(); // For direct save.
+//     },
+//     submit(frm) {
+//         console.log("Submit button checked.");
+//     },
+//     cancel(frm) {
+//         console.log("Cancel button checked");
+//     },
+//     edit(frm) {
+//         console.log("Edit button checked");
+//     },
+// });
+
+// // ---------- Function/Working for Check-Box ---------- //
+// frappe.ui.form.on('DH ClientScript Form', {
+//     yes(frm) {
+//         console.log("Yes Check-Box checked.");
+//         // frm.save(); // For direct save.
+//     },
+//     no(frm) {
+//         console.log("No Check-Box checked.");
+//     },
+// });
+
+
+frappe.ui.form.on('DH ClientScript Form', {
+	
+	country(frm){
+	 
+        console.log("On change...");
+        
+        // frappe.db.get_list('State Doctype', {
+        //     fields: ['state_name'],
+        //     filters: {
+        //         country: frm.doc.country
+        //     }
+        // }).then(records => {
+        //     console.log(records);
+        // });
+        
+        frappe.call({
+            method: 'frappe.client.get_list',
+            type: 'GET',
+            args: {
+                'doctype': 'State Doctype',
+                'filters': {'country': frm.doc.country},
+                'fields': ['state_name']
+            },
+            callback: function(r) {
+                if (r.message) {
+                    console.log("Data",r);
+                    console.log("State",r.message);
+                    
+                    // frm.refresh_field('state', '');
+                    
+                    // frm.set_value('city', 'New description');
+                    
+                    // frm.set_value('district', 'District New description');
+                    
+                    // var countryElements = $('input[name="country"]');
+                    
+                    
+                    
+                    // // // Select all form elements
+                    // var formElements = $(":input");
+                    
+                    // // Select specific types, e.g., text inputs
+                    // var textInputs = $(':input[type="text"]');
+                    
+                    // // Select all text inputs within the form
+                    // var textInputsInForm = $('form :input[type="text"]');
+                    
+                    // $('input[data-fieldname="country"]').hide();
+                    // $('select[data-fieldname="state"]').hide();
+                    
+                    $('select[data-fieldname="state"]').empty();
+                    $('select[data-fieldname="state"]').append('<option value="" selected disabled></option>');
+                    
+                    console.log(r.message.length);
+                    for(i=0; i<r.message.length; i++){
+                        
+                       $('select[data-fieldname="state"]').append('<option value=""><b>'+r.message[i]['state_name']+'</option>');
+                    }
+                    
+                    
+                    
+                    // // Select all form elements within the form with ID "myForm"
+                    // var formElementsInForm = $("#myForm :input");
+                    
+                    
+                    // frm.set_df_property('state', 'options', ['option a', 'option b']);
+                    
+                    // frm.set_value('internal_api', r.message.location); // set value on the form
+                    // frm.refresh_field("internal_api");
+                }  
+            }
+        });
+	}
+});
+
+
+//------- Test code ------//
+// frappe.ui.form.on('DH ClientScript Form', {
+//     country(frm) {
+//         frm.state['state'].get_query = function(doc) {
+//             return {
+//                 filters: {
+//                     'country': doc.country
+//                 }
+//             };
+//         };
+//     },
+
+//     state(frm) {
+//         frm.district['district'].get_query = function(doc) {
+//             return {
+//                 filters: {
+//                     'country': doc.country,
+//                     'state': doc.state
+//                 }
+//             };
+//         };
+//     },
+
+//     active(frm) {
+//         console.log("Active button checked.");
+//     },
+
+//     submit(frm) {
+//         console.log("Submit button checked.");
+//         if (frm.doc.country && frm.doc.state && frm.doc.district) {
+//             // Perform actions based on the selected country, state, and district
+//             console.log("Selected Country:", frm.doc.country);
+//             console.log("Selected State:", frm.doc.state);
+//             console.log("Selected District:", frm.doc.district);
+//         } else {
+//             frappe.msgprint(__("Please select Country, State, and District before submitting."));
+//         }
+//     },
+
+//     cancel(frm) {
+//         console.log("Cancel button checked");
+//     },
+
+//     edit(frm) {
+//         console.log("Edit button checked");
+//     },
+
+//     yes(frm) {
+//         console.log("Yes Check-Box checked.");
+//     },
+
+//     no(frm) {
+//         console.log("No Check-Box checked.");
+//     }
+// });
+
+
+// // Select all form elements
+// var formElements = $(":input");
+
+// // Select specific types, e.g., text inputs
+// var textInputs = $(':input[type="text"]');
+
+// // Select elements by name
+// var countryElement = $('[name="country"]');
+
+// // Select elements by ID
+// var usernameElement = $("#username");
+
+// // Select all text inputs within the form
+// var textInputsInForm = $('form :input[type="text"]');
+
+// // Select all form elements within the form with ID "myForm"
+// var formElementsInForm = $("#myForm :input");
+
+// // You can add a reset button using frm.add_custom_button api
+
+// // ----------------------- //
+// frappe.ui.form.on("YourDocType", {
+//   refresh: function (frm) {
+//     // Accessing a field by its name
+//     var fieldValue = frm.doc.field_name;
+
+//     // Modify the field value or perform actions
+//     if (fieldValue === "some_value") {
+//       // Do something
+//     }
+//   },
+// });
